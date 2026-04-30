@@ -204,6 +204,7 @@ export interface GlobalDashboardData {
   teams: Team[];
   employees: Employee[];
   projects: Project[];
+  projectEmployees: ProjectEmployee[];
   updates: DailyUpdate[];
   blockers: Blocker[];
   clients: Client[];

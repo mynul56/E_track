@@ -8,7 +8,7 @@ export default function LoginPage() {
         <h1 className="mt-4 text-4xl font-semibold tracking-tight">Supabase admin access</h1>
         <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-muted-foreground">
           Sign in with your admin account to access team management, daily update ingestion, project intelligence,
-          and score controls. If Supabase env vars are not configured, the app falls back to demo mode.
+          and score controls. Supabase environment variables must be configured before login can work.
         </p>
         <div className="mt-10 flex justify-center">
           <LoginForm />

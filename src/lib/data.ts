@@ -1,5 +1,4 @@
 import { differenceInCalendarDays, format, isAfter, isBefore, isSameDay, parseISO, subDays } from "date-fns";
-import { demoData } from "@/lib/demo-data";
 import { buildScoreSnapshot, calculateEmployeeScore } from "@/lib/scoring";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
@@ -10,17 +9,31 @@ import type {
   GlobalDashboardData,
   Project,
   ProjectDetailData,
+  ProjectEmployee,
   TeamDashboardData,
 } from "@/lib/types";
 
-async function fetchSupabaseSnapshot(): Promise<GlobalDashboardData | null> {
+async function fetchSupabaseSnapshot(): Promise<GlobalDashboardData> {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) return null;
+  if (!supabase) {
+    return {
+      teams: [],
+      employees: [],
+      projects: [],
+      projectEmployees: [],
+      updates: [],
+      blockers: [],
+      clients: [],
+      scores: [],
+      scoreHistory: [],
+    };
+  }
 
-  const [teams, employees, projects, updates, blockers, clients, scores, scoreHistory] = await Promise.all([
+  const [teams, employees, projects, projectEmployees, updates, blockers, clients, scores, scoreHistory] = await Promise.all([
     supabase.from("teams").select("*").order("created_at"),
     supabase.from("employees").select("*").order("created_at"),
     supabase.from("projects").select("*").order("created_at"),
+    supabase.from("project_employees").select("*").order("project_id"),
     supabase.from("daily_updates").select("*").order("date"),
     supabase.from("blockers").select("*").order("created_at"),
     supabase.from("clients").select("*").order("created_at"),
@@ -28,16 +41,29 @@ async function fetchSupabaseSnapshot(): Promise<GlobalDashboardData | null> {
     supabase.from("score_history").select("*").order("created_at"),
   ]);
 
-  const hasError = [teams, employees, projects, updates, blockers, clients, scores, scoreHistory].some(
+  const hasError = [teams, employees, projects, projectEmployees, updates, blockers, clients, scores, scoreHistory].some(
     (result) => result.error,
   );
 
-  if (hasError) return null;
+  if (hasError) {
+    return {
+      teams: [],
+      employees: [],
+      projects: [],
+      projectEmployees: [],
+      updates: [],
+      blockers: [],
+      clients: [],
+      scores: [],
+      scoreHistory: [],
+    };
+  }
 
   return {
     teams: teams.data ?? [],
     employees: employees.data ?? [],
     projects: projects.data ?? [],
+    projectEmployees: (projectEmployees.data as ProjectEmployee[]) ?? [],
     updates: (updates.data as DailyUpdate[]) ?? [],
     blockers: blockers.data ?? [],
     clients: clients.data ?? [],
@@ -46,13 +72,12 @@ async function fetchSupabaseSnapshot(): Promise<GlobalDashboardData | null> {
   };
 }
 
-export async function getGlobalData(): Promise<GlobalDashboardData & { projectEmployees: typeof demoData.projectEmployees }> {
-  const snapshot = await fetchSupabaseSnapshot();
-  return snapshot ? { ...snapshot, projectEmployees: demoData.projectEmployees } : demoData;
+export async function getGlobalData(): Promise<GlobalDashboardData> {
+  return fetchSupabaseSnapshot();
 }
 
-function getEmployeeProjects(employeeId: string, projects: Project[]) {
-  const assignedProjectIds = demoData.projectEmployees
+function getEmployeeProjects(employeeId: string, projects: Project[], projectEmployees: ProjectEmployee[]) {
+  const assignedProjectIds = projectEmployees
     .filter((entry) => entry.employee_id === employeeId)
     .map((entry) => entry.project_id);
 
@@ -235,7 +260,7 @@ export async function getTeamDashboardData(teamId: string): Promise<TeamDashboar
 
   const workloadDistribution = employees.map((employee) => ({
     employee: employee.full_name.split(" ")[0],
-    projects: getEmployeeProjects(employee.id, projects).length,
+    projects: getEmployeeProjects(employee.id, projects, data.projectEmployees).length,
   }));
 
   const milestoneCompletion = projects.map((project) => ({
@@ -288,6 +313,7 @@ export async function getTeamDashboardData(teamId: string): Promise<TeamDashboar
       teams: [team],
       employees,
       projects,
+      projectEmployees: data.projectEmployees.filter((entry) => projects.some((project) => project.id === entry.project_id)),
       updates: dailyUpdates,
       blockers,
       clients,
@@ -304,7 +330,7 @@ export async function getEmployeeProfileData(teamId: string, employeeId: string)
   if (!employee || !team) return null;
 
   const updates = data.updates.filter((entry) => entry.employee_id === employeeId);
-  const projects = getEmployeeProjects(employeeId, data.projects);
+  const projects = getEmployeeProjects(employeeId, data.projects, data.projectEmployees);
   const blockers = data.blockers.filter((entry) => entry.employee_id === employeeId);
   const score = data.scores.find((entry) => entry.employee_id === employeeId) ?? null;
   const scoreHistory = data.scoreHistory.filter((entry) => entry.employee_id === employeeId);
@@ -337,7 +363,7 @@ export async function getProjectDetailData(projectId: string): Promise<ProjectDe
   const client = data.clients.find((entry) => entry.id === project.client_id);
   const updates = data.updates.filter((entry) => entry.project_id === projectId);
   const blockers = data.blockers.filter((entry) => entry.project_id === projectId);
-  const employeeIds = demoData.projectEmployees.filter((entry) => entry.project_id === projectId).map((entry) => entry.employee_id);
+  const employeeIds = data.projectEmployees.filter((entry) => entry.project_id === projectId).map((entry) => entry.employee_id);
   const employees = data.employees.filter((entry) => employeeIds.includes(entry.id));
   const milestoneRate = Math.round((project.current_milestone / project.total_milestones) * 100);
   const deadlineRisk =

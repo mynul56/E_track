@@ -19,8 +19,7 @@ export function LoginForm() {
     startTransition(async () => {
       const supabase = createSupabaseBrowserClient();
       if (!supabase) {
-        toast.info("Supabase env is missing. The app is running in demo mode.");
-        router.push("/dashboard");
+        toast.error("Supabase is not configured. Add the required environment variables first.");
         return;
       }
 

@@ -10,7 +10,7 @@ Production-oriented admin dashboard for team-based project intelligence, built w
 - Employee scoring model with manual adjustment hooks and score history
 - Team-level analytics with 10 dashboard charts
 - Supabase-ready schema, RLS starter policies, and server actions
-- Demo-backed fallback mode so the app renders before Supabase is connected
+- Supabase-backed reads and writes with no seeded demo fallback
 
 ## Local setup
 
@@ -39,10 +39,6 @@ npm run dev
 ## Environment variables
 
 See `.env.example`.
-
-## Demo mode
-
-If Supabase env vars are missing, the app runs in demo mode using seeded in-repo data. Reads still work, but writes only validate and return success messages until Supabase is connected.
 
 ## Production checklist
 

@@ -15,7 +15,7 @@ export async function createTeamAction(input: unknown) {
   const values = teamSchema.parse(input);
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return { ok: true, mode: "demo", message: "Team validated. Connect Supabase to persist changes." };
+    return { ok: false, message: "Supabase is not configured. Add environment variables before creating teams." };
   }
 
   const { error } = await supabase.from("teams").insert({
@@ -32,7 +32,7 @@ export async function createTeamAction(input: unknown) {
 export async function deleteTeamAction(teamId: string) {
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return { ok: true, mode: "demo", message: "Delete is available, but demo mode does not persist removals." };
+    return { ok: false, message: "Supabase is not configured. Add environment variables before deleting teams." };
   }
 
   const { error } = await supabase.from("teams").delete().eq("id", teamId);
@@ -47,7 +47,7 @@ export async function createEmployeeAction(input: unknown) {
   const values = employeeSchema.parse(input);
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return { ok: true, mode: "demo", message: "Employee validated. Connect Supabase to persist changes." };
+    return { ok: false, message: "Supabase is not configured. Add environment variables before creating employees." };
   }
 
   const { error } = await supabase.from("employees").insert({
@@ -75,12 +75,7 @@ export async function saveParsedUpdateAction(input: unknown) {
   const parsed = parseTelegramUpdate(values.raw_text);
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return {
-      ok: true,
-      mode: "demo",
-      message: "Parsed successfully. Connect Supabase to persist this update.",
-      parsed,
-    };
+    return { ok: false, message: "Supabase is not configured. Add environment variables before saving updates.", parsed };
   }
 
   const { error } = await supabase.from("daily_updates").insert({
@@ -112,7 +107,7 @@ export async function adjustEmployeeScoreAction(input: unknown) {
   const values = manualScoreAdjustmentSchema.parse(input);
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
-    return { ok: true, mode: "demo", message: "Score adjustment validated. Connect Supabase to save it." };
+    return { ok: false, message: "Supabase is not configured. Add environment variables before adjusting scores." };
   }
 
   const { data: existing } = await supabase
