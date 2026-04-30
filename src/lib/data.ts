@@ -1,6 +1,6 @@
 import { differenceInCalendarDays, format, isAfter, isBefore, isSameDay, parseISO, subDays } from "date-fns";
 import { demoData } from "@/lib/demo-data";
-import { buildScoreSnapshot, calculateEmployeeScore, didSubmitToday } from "@/lib/scoring";
+import { buildScoreSnapshot, calculateEmployeeScore } from "@/lib/scoring";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type {
   DailyUpdate,

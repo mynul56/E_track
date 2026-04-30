@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { BarChart3, ClipboardPaste, Flag, FolderKanban, LayoutDashboard, Trophy, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -13,7 +16,9 @@ const navItems = [
   { href: "/teams/team-alpha-prime/employees/emp-jihad/paste-update", label: "Paste Update", icon: ClipboardPaste },
 ];
 
-export function AppSidebar({ currentPath }: { currentPath: string }) {
+export function AppSidebar() {
+  const currentPath = usePathname();
+
   return (
     <aside className="panel-glow sticky top-0 hidden h-screen w-76 shrink-0 border-r border-sidebar-border bg-sidebar/85 px-5 py-6 backdrop-blur-xl lg:block">
       <div className="flex items-center justify-between">

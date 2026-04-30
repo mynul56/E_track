@@ -1,0 +1,63 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export function LoginForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const onSubmit = () => {
+    startTransition(async () => {
+      const supabase = createSupabaseBrowserClient();
+      if (!supabase) {
+        toast.info("Supabase env is missing. The app is running in demo mode.");
+        router.push("/dashboard");
+        return;
+      }
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.success("Signed in successfully.");
+      router.push("/dashboard");
+      router.refresh();
+    });
+  };
+
+  return (
+    <Card className="panel-glow w-full max-w-md border-white/10 bg-card/80">
+      <CardHeader>
+        <CardTitle>Admin Sign In</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
+        </div>
+        <Button className="w-full" disabled={isPending} onClick={onSubmit}>
+          {isPending ? "Signing in..." : "Sign in"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}

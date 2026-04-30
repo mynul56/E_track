@@ -120,7 +120,7 @@ const projectEmployees: ProjectEmployee[] = [
   { id: "pe-7", project_id: "proj-shield", employee_id: "emp-sadia" },
 ];
 
-const dailyUpdates: DailyUpdate[] = Array.from({ length: 8 }).flatMap((_, index) => {
+const dailyUpdates = Array.from({ length: 8 }).flatMap((_, index) => {
   const day = subDays(today, 7 - index);
   const isoDay = day.toISOString();
 
@@ -296,7 +296,7 @@ const dailyUpdates: DailyUpdate[] = Array.from({ length: 8 }).flatMap((_, index)
       created_at: isoDay,
     },
   ];
-});
+}) as DailyUpdate[];
 
 const blockers: Blocker[] = [
   {

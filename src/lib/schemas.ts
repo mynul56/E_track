@@ -22,7 +22,7 @@ export const updateParserSchema = z.object({
 export const manualScoreAdjustmentSchema = z.object({
   employee_id: z.string().min(1),
   team_id: z.string().min(1),
-  score_change: z.coerce.number().min(-100).max(100),
+  score_change: z.number().min(-100).max(100),
   reason: z.string().min(5),
   adjustment_type: z.enum(["bonus", "penalty"]),
 });

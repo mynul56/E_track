@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# E Track Project Intelligence Dashboard
 
-## Getting Started
+Production-oriented admin dashboard for team-based project intelligence, built with Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, Recharts, Supabase, TanStack Query, React Hook Form, and Zod.
 
-First, run the development server:
+## Included
+
+- Admin-first navigation and command dashboard
+- Teams, employees, projects, blockers, leaderboard, reports, and paste-update flows
+- Telegram update parser with preview and warning handling
+- Employee scoring model with manual adjustment hooks and score history
+- Team-level analytics with 10 dashboard charts
+- Supabase-ready schema, RLS starter policies, and server actions
+- Demo-backed fallback mode so the app renders before Supabase is connected
+
+## Local setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create local env:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Add your Supabase and app values to `.env.local`.
+
+4. Apply the SQL in `supabase/migrations/20260430_initial.sql` to your Supabase project.
+
+5. Start the app:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+See `.env.example`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Demo mode
 
-## Learn More
+If Supabase env vars are missing, the app runs in demo mode using seeded in-repo data. Reads still work, but writes only validate and return success messages until Supabase is connected.
 
-To learn more about Next.js, take a look at the following resources:
+## Production checklist
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Configure Supabase Auth providers and admin user seed
+- Apply the SQL migration
+- Add storage bucket policy for attachments
+- Set Vercel env vars
+- Replace report export stubs with PDF and CSV route handlers
+- Optionally add middleware auth enforcement once your role claims flow is finalized

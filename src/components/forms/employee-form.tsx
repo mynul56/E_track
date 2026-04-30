@@ -66,7 +66,12 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           </div>
           <div className="space-y-2">
             <Label>Team</Label>
-            <Select defaultValue={form.getValues("team_id")} onValueChange={(value) => form.setValue("team_id", value)}>
+            <Select
+              defaultValue={form.getValues("team_id") ?? undefined}
+              onValueChange={(value) => {
+                if (value) form.setValue("team_id", value);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a team" />
               </SelectTrigger>
@@ -81,7 +86,12 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           </div>
           <div className="space-y-2">
             <Label>Role</Label>
-            <Select defaultValue="employee" onValueChange={(value) => form.setValue("role", value as EmployeeFormValues["role"])}>
+            <Select
+              defaultValue={form.getValues("role")}
+              onValueChange={(value) => {
+                if (value) form.setValue("role", value as EmployeeFormValues["role"]);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -95,7 +105,12 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           </div>
           <div className="space-y-2">
             <Label>Status</Label>
-            <Select defaultValue="active" onValueChange={(value) => form.setValue("status", value as EmployeeFormValues["status"])}>
+            <Select
+              defaultValue={form.getValues("status")}
+              onValueChange={(value) => {
+                if (value) form.setValue("status", value as EmployeeFormValues["status"]);
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

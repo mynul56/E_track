@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parseUpdateAction, saveParsedUpdateAction } from "@/app/actions";
@@ -20,7 +20,7 @@ export function UpdateParserForm({
   team: Team;
   employee: Employee;
 }) {
-  const [preview, setPreview] = useFormState<ParsedUpdate | null>(null);
+  const [preview, setPreview] = useState<ParsedUpdate | null>(null);
   const [isPending, startTransition] = useTransition();
   const form = useForm<UpdateParserFormValues>({
     resolver: zodResolver(updateParserSchema),
@@ -35,7 +35,7 @@ export function UpdateParserForm({
     startTransition(async () => {
       const result = await parseUpdateAction(values);
       if (!result.ok) return;
-      setPreview(result.parsed);
+      setPreview(result.parsed ?? null);
       toast.success("Preview generated.");
     });
   };
@@ -47,7 +47,7 @@ export function UpdateParserForm({
         toast.error(result.message);
         return;
       }
-      setPreview(result.parsed);
+      setPreview(result.parsed ?? null);
       toast.success(result.message);
     });
   };
@@ -142,9 +142,4 @@ function PreviewList({ label, values }: { label: string; values?: string[] }) {
       </div>
     </div>
   );
-}
-
-function useFormState<T>(initialValue: T) {
-  const form = useForm<{ value: T }>({ defaultValues: { value: initialValue } });
-  return [form.watch("value"), (value: T) => form.setValue("value", value)] as const;
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import type { SubmitHandler } from "react-hook-form";
 import { adjustEmployeeScoreAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +39,7 @@ export function ScoreAdjustmentForm({ employee, team }: { employee: Employee; te
     },
   });
 
-  const onSubmit = (values: ManualScoreAdjustmentValues) => {
+  const onSubmit: SubmitHandler<ManualScoreAdjustmentValues> = (values) => {
     startTransition(async () => {
       const normalized = {
         ...values,
@@ -63,7 +64,12 @@ export function ScoreAdjustmentForm({ employee, team }: { employee: Employee; te
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
             <Label>Adjustment type</Label>
-            <Select defaultValue="bonus" onValueChange={(value) => form.setValue("adjustment_type", value as "bonus" | "penalty")}>
+            <Select
+              defaultValue={form.getValues("adjustment_type")}
+              onValueChange={(value) => {
+                if (value) form.setValue("adjustment_type", value as "bonus" | "penalty");
+              }}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -75,7 +81,7 @@ export function ScoreAdjustmentForm({ employee, team }: { employee: Employee; te
           </div>
           <div className="space-y-2">
             <Label htmlFor="score_change">Score change</Label>
-            <Input id="score_change" type="number" {...form.register("score_change")} />
+            <Input id="score_change" type="number" {...form.register("score_change", { valueAsNumber: true })} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="reason">Reason</Label>
