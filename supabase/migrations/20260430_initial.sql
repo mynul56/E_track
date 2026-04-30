@@ -148,32 +148,42 @@ as $$
   select coalesce((auth.jwt() ->> 'role') = 'admin', false);
 $$;
 
+drop policy if exists "admins manage teams" on public.teams;
 create policy "admins manage teams" on public.teams
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage employees" on public.employees;
 create policy "admins manage employees" on public.employees
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage clients" on public.clients;
 create policy "admins manage clients" on public.clients
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage projects" on public.projects;
 create policy "admins manage projects" on public.projects
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage project_employees" on public.project_employees;
 create policy "admins manage project_employees" on public.project_employees
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage daily_updates" on public.daily_updates;
 create policy "admins manage daily_updates" on public.daily_updates
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage blockers" on public.blockers;
 create policy "admins manage blockers" on public.blockers
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage attachments" on public.attachments;
 create policy "admins manage attachments" on public.attachments
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage employee_scores" on public.employee_scores;
 create policy "admins manage employee_scores" on public.employee_scores
 for all using (public.is_admin()) with check (public.is_admin());
 
+drop policy if exists "admins manage score_history" on public.score_history;
 create policy "admins manage score_history" on public.score_history
 for all using (public.is_admin()) with check (public.is_admin());
