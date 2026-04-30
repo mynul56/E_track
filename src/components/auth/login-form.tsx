@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import type { FormEvent } from "react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -15,7 +16,9 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const onSubmit = () => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     startTransition(async () => {
       const supabase = createSupabaseBrowserClient();
       if (!supabase) {
@@ -44,18 +47,26 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Admin Sign In</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} />
-        </div>
-        <Button className="w-full" disabled={isPending} onClick={onSubmit}>
-          {isPending ? "Signing in..." : "Sign in"}
-        </Button>
+      <CardContent>
+        <form className="space-y-4" onSubmit={onSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
+          <Button className="w-full" disabled={isPending} type="submit">
+            {isPending ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

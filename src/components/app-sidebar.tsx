@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BarChart3, ClipboardPaste, Flag, FolderKanban, LayoutDashboard, Trophy, Users } from "lucide-react";
+import { BarChart3, ClipboardPaste, Flag, FolderKanban, LayoutDashboard, LogIn, Trophy, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +55,14 @@ export function AppSidebar() {
         <p className="font-medium text-foreground">Operational Focus</p>
         <p className="mt-2">Watch missing updates, deadline risk, and repeated blockers before they snowball.</p>
       </div>
+
+      <Link
+        href="/login"
+        className="mt-4 flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-sidebar-foreground/70 transition hover:bg-sidebar-accent hover:text-sidebar-foreground"
+      >
+        <LogIn className="h-4 w-4" />
+        <span>Login</span>
+      </Link>
     </aside>
   );
 }
