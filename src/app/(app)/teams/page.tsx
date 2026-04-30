@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getGlobalData } from "@/lib/data";
 import { EmployeeForm } from "@/components/forms/employee-form";
+import { TeamDeleteButton } from "@/components/forms/team-delete-button";
 import { TeamForm } from "@/components/forms/team-form";
 import { MetricCard } from "@/components/metric-card";
 import { PageHeader } from "@/components/page-header";
@@ -57,6 +58,7 @@ export default async function TeamsPage() {
                     <Link href={`/teams/${team.id}/leaderboard`} className="text-sm text-primary hover:text-primary/80">
                       Team leaderboard
                     </Link>
+                    <TeamDeleteButton teamId={team.id} teamName={team.team_name} />
                   </div>
                 </CardContent>
               </Card>

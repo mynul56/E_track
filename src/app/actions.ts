@@ -29,6 +29,20 @@ export async function createTeamAction(input: unknown) {
   return { ok: true, mode: "live", message: "Team created successfully." };
 }
 
+export async function deleteTeamAction(teamId: string) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { ok: true, mode: "demo", message: "Delete is available, but demo mode does not persist removals." };
+  }
+
+  const { error } = await supabase.from("teams").delete().eq("id", teamId);
+
+  if (error) return { ok: false, message: error.message };
+  revalidatePath("/teams");
+  revalidatePath("/dashboard");
+  return { ok: true, mode: "live", message: "Team deleted successfully." };
+}
+
 export async function createEmployeeAction(input: unknown) {
   const values = employeeSchema.parse(input);
   const supabase = await createSupabaseServerClient();

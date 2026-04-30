@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTeamDashboardData } from "@/lib/data";
 import { EmployeeForm } from "@/components/forms/employee-form";
+import { TeamDeleteButton } from "@/components/forms/team-delete-button";
 import { MetricCard } from "@/components/metric-card";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ export default async function TeamDetailPage({
             <Link href={`/teams/${teamId}/leaderboard`} className="text-sm text-primary hover:text-primary/80">
               Score leaderboard
             </Link>
+            <TeamDeleteButton teamId={data.team.id} teamName={data.team.team_name} redirectToTeams />
           </div>
         }
       />
