@@ -2,8 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { createEmployeeAction } from "@/app/actions";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import type { Team } from "@/lib/types";
 export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultTeamId?: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const fallbackTeamId = defaultTeamId ?? teams[0]?.id ?? "";
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
@@ -30,9 +31,18 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
       employee_code: "",
       role: "employee",
       status: "active",
-      team_id: defaultTeamId ?? teams[0]?.id ?? "",
+      team_id: fallbackTeamId,
     },
   });
+  const teamId = useWatch({ control: form.control, name: "team_id" });
+  const role = useWatch({ control: form.control, name: "role" });
+  const status = useWatch({ control: form.control, name: "status" });
+
+  useEffect(() => {
+    if (!teamId && fallbackTeamId) {
+      form.setValue("team_id", fallbackTeamId, { shouldValidate: true });
+    }
+  }, [fallbackTeamId, form, teamId]);
 
   const onSubmit = (values: EmployeeFormValues) => {
     startTransition(async () => {
@@ -67,9 +77,9 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           <div className="space-y-2">
             <Label>Team</Label>
             <Select
-              defaultValue={form.getValues("team_id") ?? undefined}
+              value={teamId || null}
               onValueChange={(value) => {
-                if (value) form.setValue("team_id", value);
+                form.setValue("team_id", value ?? "", { shouldValidate: true });
               }}
             >
               <SelectTrigger>
@@ -87,9 +97,9 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           <div className="space-y-2">
             <Label>Role</Label>
             <Select
-              defaultValue={form.getValues("role")}
+              value={role}
               onValueChange={(value) => {
-                if (value) form.setValue("role", value as EmployeeFormValues["role"]);
+                if (value) form.setValue("role", value as EmployeeFormValues["role"], { shouldValidate: true });
               }}
             >
               <SelectTrigger>
@@ -106,9 +116,9 @@ export function EmployeeForm({ teams, defaultTeamId }: { teams: Team[]; defaultT
           <div className="space-y-2">
             <Label>Status</Label>
             <Select
-              defaultValue={form.getValues("status")}
+              value={status}
               onValueChange={(value) => {
-                if (value) form.setValue("status", value as EmployeeFormValues["status"]);
+                if (value) form.setValue("status", value as EmployeeFormValues["status"], { shouldValidate: true });
               }}
             >
               <SelectTrigger>
