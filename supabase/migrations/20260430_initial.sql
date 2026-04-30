@@ -1,5 +1,13 @@
 create extension if not exists "pgcrypto";
 
+create table if not exists public.user_roles (
+  user_id uuid primary key,
+  email text,
+  app_role text not null check (app_role in ('admin', 'team_leader', 'viewer')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.teams (
   id uuid primary key default gen_random_uuid(),
   team_name text not null unique,
@@ -128,7 +136,9 @@ create index if not exists idx_daily_updates_employee_id on public.daily_updates
 create index if not exists idx_daily_updates_project_id on public.daily_updates(project_id);
 create index if not exists idx_blockers_team_id on public.blockers(team_id);
 create index if not exists idx_score_history_employee_id on public.score_history(employee_id);
+create index if not exists idx_user_roles_app_role on public.user_roles(app_role);
 
+alter table public.user_roles enable row level security;
 alter table public.teams enable row level security;
 alter table public.employees enable row level security;
 alter table public.clients enable row level security;
@@ -145,8 +155,37 @@ returns boolean
 language sql
 stable
 as $$
-  select coalesce((auth.jwt() ->> 'role') = 'admin', false);
+  select exists (
+    select 1
+    from public.user_roles
+    where user_id = auth.uid()
+      and app_role = 'admin'
+  );
 $$;
+
+create or replace function public.set_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_user_roles_set_updated_at on public.user_roles;
+create trigger trg_user_roles_set_updated_at
+before update on public.user_roles
+for each row
+execute function public.set_updated_at();
+
+drop policy if exists "users can read own role" on public.user_roles;
+create policy "users can read own role" on public.user_roles
+for select using (auth.uid() = user_id or public.is_admin());
+
+drop policy if exists "admins manage user_roles" on public.user_roles;
+create policy "admins manage user_roles" on public.user_roles
+for all using (public.is_admin()) with check (public.is_admin());
 
 drop policy if exists "admins manage teams" on public.teams;
 create policy "admins manage teams" on public.teams
